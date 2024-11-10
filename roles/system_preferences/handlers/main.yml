@@ -6,3 +6,10 @@
 
 - name: restart Finder
   command: killall Finder
+
+- name: restart SystemUIServer
+  command: killall SystemUIServer
+
+- name: restart ssh
+  command: launchctl stop com.openssh.sshd && launchctl start com.openssh.sshd
+  become: true

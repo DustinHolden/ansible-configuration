@@ -1,1 +1,63 @@
-selected_casks: "{{ work_homebrew_casks + personal_homebrew_casks if environment_type == 'personal' else work_homebrew_casks }}"
+# roles/apps/tasks/main.yml
+
+# Fetch the latest Homebrew release data
+- name: Fetch latest Homebrew release data from GitHub
+  uri:
+    url: https://api.github.com/repos/Homebrew/brew/releases/latest
+    return_content: true
+  register: latest_release
+  tags: homebrew
+
+# Set Homebrew download URL with fallback
+- name: Set Homebrew download URL with fallback
+  set_fact:
+    homebrew_download_url: "{{ latest_release.json.assets | selectattr('name', 'match', '\\.pkg$') | map(attribute='browser_download_url') | first | default('https://github.com/Homebrew/brew/releases/download/4.4.4/Homebrew-4.4.4.pkg') }}"
+  tags: homebrew
+
+# Download Homebrew .pkg installer
+- name: Download Homebrew .pkg installer
+  get_url:
+    url: "{{ homebrew_download_url }}"
+    dest: /tmp/Homebrew-latest.pkg
+  when: not ("/opt/homebrew/bin/brew" is exists or "/usr/local/bin/brew" is exists)
+  tags: homebrew
+
+# Install Homebrew via .pkg
+- name: Install Homebrew via .pkg
+  package:
+    name: /tmp/Homebrew-latest.pkg
+    state: present
+  when: not ("/opt/homebrew/bin/brew" is exists or "/usr/local/bin/brew" is exists)
+  tags: homebrew
+
+# Ensure Homebrew is in PATH
+- name: Ensure Homebrew is in PATH
+  shell: echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile && eval "$(/opt/homebrew/bin/brew shellenv)"
+  args:
+    executable: /bin/bash
+  when: ansible_os_family == "Darwin" and not ("/opt/homebrew/bin/brew" is exists or "/usr/local/bin/brew" is exists)
+  tags: homebrew
+
+# Install Homebrew CLI packages
+- name: Install Homebrew packages
+  homebrew:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ homebrew_packages }}"
+
+# Install Cask applications based on environment type
+- name: Determine selected casks based on environment type
+  set_fact:
+    selected_casks: "{{ work_homebrew_casks + personal_homebrew_casks if environment_type == 'personal' else work_homebrew_casks }}"
+
+- name: Install Homebrew cask applications
+  homebrew_cask:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ selected_casks }}"
+
+# # Simplified Mac App Store application installation with `reattach-to-user-namespace`
+# - name: Install Mac App Store applications with reattach-to-user-namespace
+#   command: reattach-to-user-namespace mas install "{{ item.id }}"
+#   loop: "{{ mas_apps }}"
+#   tags: mas

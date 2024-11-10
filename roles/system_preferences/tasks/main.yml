@@ -1,31 +1,50 @@
 # roles/system_preferences/tasks/main.yml
 
-# Ensure iCloud Drive path exists
-- name: Ensure iCloud Drive path exists
-  file:
-    path: "{{ ansible_env.HOME }}/Library/Mobile Documents/com~apple~CloudDocs"
-    state: directory
+# # Ensure iCloud Drive path exists
+# - name: Ensure iCloud Drive path exists
+#   file:
+#     path: "{{ ansible_env.HOME }}/Library/Mobile Documents/com~apple~CloudDocs"
+#     state: directory
 
-# Create symlink for Desktop in home directory
-- name: Create symlink for Desktop in home directory
-  file:
-    src: "{{ ansible_env.HOME }}/Library/Mobile Documents/com~apple~CloudDocs/Desktop"
-    dest: "{{ ansible_env.HOME }}/Desktop"
-    state: link
+# # Create symlink for Desktop in home directory
+# - name: Create symlink for Desktop in home directory
+#   file:
+#     src: "{{ ansible_env.HOME }}/Library/Mobile Documents/com~apple~CloudDocs/Desktop"
+#     dest: "{{ ansible_env.HOME }}/Desktop"
+#     state: link
 
-# Create symlink for Documents in home directory
-- name: Create symlink for Documents in home directory
-  file:
-    src: "{{ ansible_env.HOME }}/Library/Mobile Documents/com~apple~CloudDocs/Documents"
-    dest: "{{ ansible_env.HOME }}/Documents"
-    state: link
+# # Create symlink for Documents in home directory
+# - name: Create symlink for Documents in home directory
+#   file:
+#     src: "{{ ansible_env.HOME }}/Library/Mobile Documents/com~apple~CloudDocs/Documents"
+#     dest: "{{ ansible_env.HOME }}/Documents"
+#     state: link
 
-# Create symlink for Downloads in home directory
-- name: Create symlink for Downloads in home directory
-  file:
-    src: "{{ ansible_env.HOME }}/Library/Mobile Documents/com~apple~CloudDocs/Downloads"
-    dest: "{{ ansible_env.HOME }}/Downloads"
-    state: link
+# # Create symlink for Downloads in home directory
+# - name: Create symlink for Downloads in home directory
+#   file:
+#     src: "{{ ansible_env.HOME }}/Library/Mobile Documents/com~apple~CloudDocs/Downloads"
+#     dest: "{{ ansible_env.HOME }}/Downloads"
+#     state: link
+
+# Enable Remote Login (SSH) on macOS
+- name: Enable Remote Login (SSH)
+  command: systemsetup -setremotelogin on
+  become: true  # Ensures the command is run with elevated privileges
+
+- name: Start SSH service (com.openssh.sshd)
+  command: sudo launchctl load -w /System/Library/LaunchDaemons/ssh.plist
+  become: true
+  ignore_errors: true  # Ignore errors in case it's already loaded
+
+- name: Restrict SSH access to specific users
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?AllowUsers'
+    line: 'AllowUsers dustinholden'
+    state: present
+  become: true
+  notify: restart ssh
     
 # Dock Settings
 - name: Set Dock to auto-hide
@@ -99,16 +118,15 @@
 
 - name: Enable tap-to-click for Magic Mouse
   command: defaults write com.apple.mouse.tapBehavior -int 1
-  command: defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
   notify: restart SystemUIServer
 
 # Power and Screen Settings
 - name: Disable screensaver password delay
   command: defaults write com.apple.screensaver askForPassword -int 1
-  command: defaults write com.apple.screensaver askForPasswordDelay -int 0
 
 - name: Set display sleep timer to 10 minutes
   command: pmset displaysleep 10
+  become: true
 
 # Date & Time
 - name: Show date in menu bar
@@ -123,6 +141,7 @@
 - name: Enable reduce motion
   command: defaults write com.apple.universalaccess reduceMotion -bool true
   notify: restart SystemUIServer
+  become: true
 
 - name: Enable full keyboard access for all controls
   command: defaults write NSGlobalDomain AppleKeyboardUIMode -int 3

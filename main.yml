@@ -3,6 +3,8 @@
   vars:
     environment_type: "personal"   # Change to "personal" for personal machines
   roles:
+    - setup
+    - dotfiles
     - apps
     - system_preferences
 

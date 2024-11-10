@@ -9,11 +9,12 @@ homebrew_packages:
   - gnupg                       # GPG for encryption
   - gpg                         # Another GPG encryption library, could consolidate with gnupg
   - icu4c@75                    # International Components for Unicode
-  - mas                         # Mac App Store CLI for managing app installations
+  # - mas                         # Mac App Store CLI for managing app installations
   - node                        # JavaScript runtime for development
   - nmap                        # Network scanner
   - openssl                     # Security and encryption toolkit
   - python@3.13                 # Latest Python version
+  # - reattach-to-user-namespace  # Used to attach mas to signed in apple id
   - ssh-copy-id                 # Adds SSH keys to remote hosts
   - tart                        # VM manager for macOS (like Docker for macOS)
   - wget                        # Command-line file downloader
