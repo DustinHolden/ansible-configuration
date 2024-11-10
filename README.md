@@ -1,11 +1,8 @@
-```
-roles/
-└── role_name/
-    ├── tasks/         # Main tasks for this role (usually main.yml)
-    ├── vars/          # Variables for this role (usually main.yml)
-    ├── defaults/      # Default variables for this role (usually main.yml)
-    ├── handlers/      # Handlers to notify on task changes
-    ├── files/         # Static files used by the role
-    ├── templates/     # Templates used by the role
-    └── meta/          # Metadata about the role, including dependencies
-```
+# Fresh Install Notes
+
+`xcode-select --install`
+`pip3 install ansible`
+Either download the repo or git clone (you probably don't have git installed yet)
+Then run `ansible-playbook main.yml --ask-become-pass` from the directory of this repo
+
+You'll also want to clone dotfiles repo as well.
