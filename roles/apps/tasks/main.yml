@@ -1,0 +1,1 @@
+selected_casks: "{{ work_homebrew_casks + personal_homebrew_casks if environment_type == 'personal' else work_homebrew_casks }}"

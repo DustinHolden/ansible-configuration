@@ -1,0 +1,24 @@
+# main.yml or dotfiles role
+---
+
+- name: Set up dotfiles with Dotbot
+  hosts: localhost
+  tasks:
+    - name: Ensure Projects directory exists
+      file:
+        path: "{{ ansible_env.HOME }}/Projects"
+        state: directory
+      tags: dotfiles
+    - name: Clone dotfiles repository
+      git:
+        repo: "https://github.com/dustinholden/dotfiles.git"
+        dest: "{{ ansible_env.HOME }}/Projects/dotfiles"
+        version: main
+        update: yes
+      tags: dotfiles
+
+    - name: Run Dotbot to set up dotfiles
+      command: ./install
+      args:
+        chdir: "{{ ansible_env.HOME }}/dotfiles"
+      tags: dotfiles

@@ -1,0 +1,74 @@
+# roles/apps/vars/main.yml
+---
+
+# Homebrew Packages - CLI tools and utilities for all setups
+homebrew_packages:
+  - docker                      # Container management
+  - docker-compose              # Docker multi-container support
+  - gh                          # GitHub CLI
+  - gnupg                       # GPG for encryption
+  - gpg                         # Another GPG encryption library, could consolidate with gnupg
+  - icu4c@75                    # International Components for Unicode
+  - mas                         # Mac App Store CLI for managing app installations
+  - node                        # JavaScript runtime for development
+  - nmap                        # Network scanner
+  - openssl                     # Security and encryption toolkit
+  - python@3.13                 # Latest Python version
+  - ssh-copy-id                 # Adds SSH keys to remote hosts
+  - tart                        # VM manager for macOS (like Docker for macOS)
+  - wget                        # Command-line file downloader
+  - zsh-autosuggestions         # Zsh plugin for command suggestions
+  - zsh-completions             # Zsh completion enhancements
+  - zsh-history-substring-search  # Zsh plugin for command history search
+
+# Work-specific Casks: Essential apps for productivity and development
+work_homebrew_casks:
+  - balenaetcher                # Flash OS images to SD cards
+  - chromedriver                # ChromeDriver for automated testing
+  - docker                      # Desktop GUI for Docker management
+  - ente-auth                   # Possibly for auth purposes
+  - firefox                     # Secondary web browser
+  - google-chrome               # Primary web browser
+  - jetbrains-toolbox           # JetBrains IDE manager
+  - microsoft-auto-update       # Update manager for Microsoft products
+  - microsoft-office-businesspro # Office suite for work productivity
+  - obs                         # Streaming and recording software
+  - postman                     # API testing and development tool
+  - termius                     # SSH and SFTP Client
+  - visual-studio-code          # Code editor
+  - zoom                        # Video conferencing
+
+# Personal-specific Casks: Apps you only want on your personal setup
+personal_homebrew_casks:
+  - airfoil                     # Rogue Amoeba app for streaming audio
+  - discord                     # Chat application, often for personal use
+  - nvidia-geforce-now          # Cloud gaming service by NVIDIA
+  - steam                       # Gaming platform
+  - tailscale                   # VPN and secure network connections
+  - vlc                         # Versatile media player
+  - whisky                      # Open-source alternative to CrossOver for running Windows apps
+
+# Primary Workstation Casks: Apps needed on your main machine only
+primary_workstation_casks:
+  - audio-hijack                # Advanced audio recording by Rogue Amoeba
+  - elgato-stream-deck          # Control deck for streaming
+  - loopback                    # Rogue Amoeba app for audio routing
+  - mutedeck                    # Elgato Stream Deck plugin for muting
+  - soundsource                 # Rogue Amoeba app for controlling audio output
+
+# Mac App Store Applications - Automate installation of key App Store apps
+mas_apps:
+  - id: 553245401               # Friendly Streaming - consider an alternative like Elmedia
+    name: Friendly Streaming
+  - id: 1440147259              # AdGuard for Safari - ad blocker
+    name: AdGuard for Safari
+  - id: 409183694               # Keynote - presentation app
+    name: Keynote
+  - id: 409203825               # Numbers - spreadsheet app
+    name: Numbers
+  - id: 409201541               # Pages - word processing app
+    name: Pages
+  - id: 441258766               # Magnet - window manager for better multitasking
+    name: Magnet
+  - id: 1276493162              # reMarkable Desktop - for connecting and managing the reMarkable tablet
+    name: reMarkable Desktop
