@@ -1,0 +1,7 @@
+# roles/setup/tasks/main.yml
+
+- name: Add SSH public key to remote server
+  authorized_key:
+    user: dustinholden
+    state: present
+    key: "{{ lookup('file', '~/Projects/dotfiles/ssh_keys/id_rsa_dotfiles.pub') }}"
