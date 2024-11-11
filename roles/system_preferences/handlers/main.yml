@@ -1,15 +1,10 @@
 # roles/system_preferences/handlers/main.yml
----
 
 - name: restart Dock
   command: killall Dock
 
 - name: restart Finder
-  command: killall Finder
+  command: killall cfprefsd && killall Finder
 
 - name: restart SystemUIServer
   command: killall SystemUIServer
-
-- name: restart ssh
-  command: launchctl stop com.openssh.sshd && launchctl start com.openssh.sshd
-  become: true

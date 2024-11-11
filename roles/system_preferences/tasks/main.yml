@@ -1,51 +1,13 @@
 # roles/system_preferences/tasks/main.yml
 
-# # Ensure iCloud Drive path exists
-# - name: Ensure iCloud Drive path exists
-#   file:
-#     path: "{{ ansible_env.HOME }}/Library/Mobile Documents/com~apple~CloudDocs"
-#     state: directory
-
-# # Create symlink for Desktop in home directory
-# - name: Create symlink for Desktop in home directory
-#   file:
-#     src: "{{ ansible_env.HOME }}/Library/Mobile Documents/com~apple~CloudDocs/Desktop"
-#     dest: "{{ ansible_env.HOME }}/Desktop"
-#     state: link
-
-# # Create symlink for Documents in home directory
-# - name: Create symlink for Documents in home directory
-#   file:
-#     src: "{{ ansible_env.HOME }}/Library/Mobile Documents/com~apple~CloudDocs/Documents"
-#     dest: "{{ ansible_env.HOME }}/Documents"
-#     state: link
-
-# # Create symlink for Downloads in home directory
-# - name: Create symlink for Downloads in home directory
-#   file:
-#     src: "{{ ansible_env.HOME }}/Library/Mobile Documents/com~apple~CloudDocs/Downloads"
-#     dest: "{{ ansible_env.HOME }}/Downloads"
-#     state: link
-
-# Enable Remote Login (SSH) on macOS
-- name: Enable Remote Login (SSH)
-  command: systemsetup -setremotelogin on
-  become: true  # Ensures the command is run with elevated privileges
-
-- name: Start SSH service (com.openssh.sshd)
-  command: sudo launchctl load -w /System/Library/LaunchDaemons/ssh.plist
+# Desktop and Wallpaper
+- name: Set Desktop wallpaper to black
+  command: osascript -e 'tell application "System Events" to set picture of every desktop to "/System/Library/Desktop Pictures/Solid Colors/Black.png"'
   become: true
-  ignore_errors: true  # Ignore errors in case it's already loaded
+  become_user: "{{ ansible_facts['user_id'] }}"
+  tags: system_preferences
+  notify: restart Dock
 
-- name: Restrict SSH access to specific users
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: '^#?AllowUsers'
-    line: 'AllowUsers dustinholden'
-    state: present
-  become: true
-  notify: restart ssh
-    
 # Dock Settings
 - name: Set Dock to auto-hide
   command: defaults write com.apple.dock autohide -bool true
@@ -72,12 +34,12 @@
   notify: restart Dock
 
 # Finder Settings
-- name: Show hidden files in Finder
-  command: defaults write com.apple.finder AppleShowAllFiles -bool true
+- name: Do not show hidden files in Finder
+  command: defaults write com.apple.finder AppleShowAllFiles -bool false
   notify: restart Finder
 
-- name: Show all file extensions in Finder
-  command: defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+- name: Hide all file extensions in Finder
+  command: defaults write NSGlobalDomain AppleShowAllExtensions -bool false
   notify: restart Finder
 
 - name: Set Finder default location to home
@@ -96,80 +58,52 @@
   command: defaults write com.apple.finder ShowRecentTags -bool false
   notify: restart Finder
 
-# Screenshots
-- name: Set screenshot save location to iCloud Drive
-  command: defaults write com.apple.screencapture location -string "${HOME}/iCloudDrive/Screenshots"
-  notify: restart SystemUIServer
+- name: Sort folders before files in Finder
+  command: defaults write com.apple.finder _FXSortFoldersFirst -bool true
+  notify: restart Finder
 
-- name: Set screenshot format to PNG
-  command: defaults write com.apple.screencapture type -string "png"
-  notify: restart SystemUIServer
+- name: Hide disks on Desktop
+  command: defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool false
+  notify: restart Finder
 
-# Keyboard and Trackpad Settings
-- name: Set fast key repeat rate
-  command: defaults write NSGlobalDomain KeyRepeat -int 2
-
-- name: Set short delay until repeat
-  command: defaults write NSGlobalDomain InitialKeyRepeat -int 15
-
-- name: Enable tap-to-click on the trackpad
-  command: defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
-  notify: restart SystemUIServer
-
-- name: Enable tap-to-click for Magic Mouse
-  command: defaults write com.apple.mouse.tapBehavior -int 1
-  notify: restart SystemUIServer
-
-# Power and Screen Settings
-- name: Disable screensaver password delay
-  command: defaults write com.apple.screensaver askForPassword -int 1
-
-- name: Set display sleep timer to 10 minutes
-  command: pmset displaysleep 10
+- name: Status Path Bar starts at HOME
+  command: defaults write /Library/Preferences/com.apple.finder PathBarRootAtHome -bool true
   become: true
+  notify: restart Finder
 
-# Date & Time
-- name: Show date in menu bar
-  command: defaults write com.apple.menuextra.clock "DateFormat" -string "EEE MMM d  h:mm a"
-  notify: restart SystemUIServer
-
+# Date & Time Settings
 - name: Set time format to 24-hour
   command: defaults write NSGlobalDomain AppleICUForce24HourTime -bool true
   notify: restart SystemUIServer
 
-# Accessibility
-- name: Enable reduce motion
-  command: defaults write com.apple.universalaccess reduceMotion -bool true
-  notify: restart SystemUIServer
-  become: true
+# Disable Metadata Creation
+- name: Disable creation of metadata files on USB Volumes
+  command: defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+  notify: restart Finder
 
-- name: Enable full keyboard access for all controls
-  command: defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
-  notify: restart SystemUIServer
+- name: Disable creation of metadata files on Network Volumes
+  command: defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+  notify: restart Finder
 
-# Symlink iCloud Drive
-- name: Create iCloud Drive symlink in home directory
-  file:
-    src: "{{ ansible_env.HOME }}/Library/Mobile Documents/com~apple~CloudDocs"
-    dest: "{{ ansible_env.HOME }}/iCloudDrive"
-    state: link
-
-# Set scroll direction (natural scrolling)
-- name: Enable natural scrolling
-  command: defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
+# Disable Special Character on KeyHold
+- name: Turn off small popup menu showing accent characters
+  command: defaults write -g ApplePressAndHoldEnabled -bool false
   notify: restart SystemUIServer
 
-# Set trackpad scroll speed (0 is slow, 3 is fast)
-- name: Set trackpad scroll speed
-  command: defaults write -g com.apple.trackpad.scaling -float 2.0
+# Close Printer App when printing completes
+- name: Close Printer App
+  command: defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
+  notify: restart Finder
+
+# # Mail
+# - name: Windows Friendly Attachments
+#   command: defaults write com.apple.mail SendWindowsFriendlyAttachments -bool true
+
+# Magic Bluetooth Trackpad
+- name: Enable Tap to Click for Bluetooth Trackpad
+  command: defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
   notify: restart SystemUIServer
 
-# Set mouse scroll speed (0 is slow, 3 is fast)
-- name: Set mouse scroll speed
-  command: defaults write -g com.apple.mouse.scaling -float 2.0
-  notify: restart SystemUIServer
-
-# Set mouse pointer (tracking) speed
-- name: Set mouse pointer speed
-  command: defaults write -g com.apple.mouse.scaling -float 2.0
-  notify: restart SystemUIServer
+# Screenshots
+- name: Enable drop shadow on screenshots
+  command: defaults write com.apple.screencapture disable-shadow -bool false

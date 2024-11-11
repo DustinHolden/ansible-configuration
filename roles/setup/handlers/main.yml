@@ -1,0 +1,4 @@
+# roles/setup/handlers/main.yml
+
+- name: restart ssh
+  command: systemsetup -f -setremotelogin on

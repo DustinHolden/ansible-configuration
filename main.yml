@@ -2,9 +2,19 @@
 - hosts: mac-mini-m2-pro
   vars:
     environment_type: "personal"   # Change to "personal" for personal machines
+    is_primary: true
   roles:
-    - setup
     - dotfiles
+    - setup
+    - apps
+    - system_preferences
+
+- hosts: macbook-m1-pro
+  vars:
+    environment_type: "personal"   # Change to "personal" for personal machines
+  roles:
+    - dotfiles
+    - setup
     - apps
     - system_preferences
 

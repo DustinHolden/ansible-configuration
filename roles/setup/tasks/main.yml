@@ -5,3 +5,30 @@
     user: dustinholden
     state: present
     key: "{{ lookup('file', '~/Projects/dotfiles/ssh_keys/id_rsa_dotfiles.pub') }}"
+
+- name: Ensure SSH public key is in authorized_keys
+  ansible.builtin.lineinfile:
+    path: ~/.ssh/authorized_keys
+    line: "{{ lookup('file', '~/.ssh/id_rsa_dotfiles.pub') }}"
+    create: yes
+    state: present
+    mode: '0600'
+
+  # Enable Remote Login (SSH) on macOS
+- name: Enable Remote Login (SSH)
+  command: systemsetup -setremotelogin on
+  become: true
+
+- name: Start SSH service (com.openssh.sshd)
+  command: launchctl load -w /System/Library/LaunchDaemons/ssh.plist
+  become: true
+  ignore_errors: true
+
+- name: Restrict SSH access to specific users
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?AllowUsers'
+    line: 'AllowUsers dustinholden'
+    state: present
+  become: true
+  notify: restart ssh

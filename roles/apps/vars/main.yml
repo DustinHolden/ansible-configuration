@@ -3,13 +3,12 @@
 
 # Homebrew Packages - CLI tools and utilities for all setups
 homebrew_packages:
-  - docker                      # Container management
   - docker-compose              # Docker multi-container support
   - gh                          # GitHub CLI
   - gnupg                       # GPG for encryption
   - gpg                         # Another GPG encryption library, could consolidate with gnupg
   - icu4c@75                    # International Components for Unicode
-  # - mas                         # Mac App Store CLI for managing app installations
+  - mas                         # Mac App Store CLI for managing app installations
   - node                        # JavaScript runtime for development
   - nmap                        # Network scanner
   - openssl                     # Security and encryption toolkit
@@ -21,10 +20,12 @@ homebrew_packages:
   - zsh-autosuggestions         # Zsh plugin for command suggestions
   - zsh-completions             # Zsh completion enhancements
   - zsh-history-substring-search  # Zsh plugin for command history search
+  - zsh-syntax-highlighting   
 
 # Work-specific Casks: Essential apps for productivity and development
 work_homebrew_casks:
   - balenaetcher                # Flash OS images to SD cards
+  - chatgpt                     # MacOS Native Application for ChatGPT
   - chromedriver                # ChromeDriver for automated testing
   - docker                      # Desktop GUI for Docker management
   - ente-auth                   # Possibly for auth purposes

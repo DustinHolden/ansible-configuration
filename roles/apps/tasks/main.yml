@@ -22,11 +22,9 @@
   when: not ("/opt/homebrew/bin/brew" is exists or "/usr/local/bin/brew" is exists)
   tags: homebrew
 
-# Install Homebrew via .pkg
+# Install Homebrew via .pkg using macOS installer command
 - name: Install Homebrew via .pkg
-  package:
-    name: /tmp/Homebrew-latest.pkg
-    state: present
+  command: sudo installer -pkg /tmp/Homebrew-latest.pkg -target /
   when: not ("/opt/homebrew/bin/brew" is exists or "/usr/local/bin/brew" is exists)
   tags: homebrew
 
@@ -46,18 +44,28 @@
   loop: "{{ homebrew_packages }}"
 
 # Install Cask applications based on environment type
-- name: Determine selected casks based on environment type
+# Install Cask applications based on environment type and primary status
+- name: Determine selected casks based on environment type and primary status
   set_fact:
-    selected_casks: "{{ work_homebrew_casks + personal_homebrew_casks if environment_type == 'personal' else work_homebrew_casks }}"
-
+    selected_casks: >
+      {{
+        (work_homebrew_casks + personal_homebrew_casks + primary_workstation_casks)
+        if environment_type == 'personal' and is_primary
+        else (work_homebrew_casks + primary_workstation_casks)
+        if is_primary
+        else (work_homebrew_casks + personal_homebrew_casks)
+        if environment_type == 'personal'
+        else work_homebrew_casks
+      }}
+      
 - name: Install Homebrew cask applications
   homebrew_cask:
     name: "{{ item }}"
     state: present
   loop: "{{ selected_casks }}"
 
-# # Simplified Mac App Store application installation with `reattach-to-user-namespace`
-# - name: Install Mac App Store applications with reattach-to-user-namespace
-#   command: reattach-to-user-namespace mas install "{{ item.id }}"
-#   loop: "{{ mas_apps }}"
-#   tags: mas
+# Simplified Mac App Store application installation with mas
+- name: Install Mac App Store applications with mas
+  command: mas install "{{ item.id }}"
+  loop: "{{ mas_apps }}"
+  tags: mas
