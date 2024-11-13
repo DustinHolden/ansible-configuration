@@ -6,6 +6,7 @@ all:
       ansible_python_interpreter: /usr/bin/python3
       
     macbook-m1-pro:
-      ansible_host: macbook-m1-pro.local
-      ansible_ssh_private_key_file: ~/.ssh/id_rsa_dotfiles
+      ansible_connection: local
+      # ansible_host: macbook-m1-pro.local
+      # ansible_ssh_private_key_file: ~/.ssh/id_rsa_dotfiles
       ansible_python_interpreter: /usr/bin/python3

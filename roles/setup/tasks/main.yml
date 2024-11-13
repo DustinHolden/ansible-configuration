@@ -4,12 +4,12 @@
   authorized_key:
     user: dustinholden
     state: present
-    key: "{{ lookup('file', '~/Projects/dotfiles/ssh_keys/id_rsa_dotfiles.pub') }}"
+    key: "{{ lookup('file', '~/Projects/personal/dotfiles/ssh_keys/id_rsa_dotfiles.pub') }}"
 
 - name: Ensure SSH public key is in authorized_keys
   ansible.builtin.lineinfile:
     path: ~/.ssh/authorized_keys
-    line: "{{ lookup('file', '~/.ssh/id_rsa_dotfiles.pub') }}"
+    line: "{{ lookup('file', '~/Projects/personal/dotfiles/ssh_keys/id_rsa_dotfiles.pub') }}"
     create: yes
     state: present
     mode: '0600'

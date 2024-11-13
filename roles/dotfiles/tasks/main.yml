@@ -1,4 +1,9 @@
----
+- name: Ensure PyYAML is installed
+  pip:
+    name: pyyaml
+    state: present
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
 - name: Ensure Projects directory exists
   file:
@@ -9,7 +14,7 @@
 - name: Check if there are uncommitted changes in the dotfiles repository
   command: git status --porcelain
   args:
-    chdir: "{{ ansible_env.HOME }}/Projects/dotfiles"
+    chdir: "{{ ansible_env.HOME }}/Projects/personal/dotfiles"
   register: git_status
   ignore_errors: yes
   changed_when: git_status.stdout != ""
@@ -18,14 +23,14 @@
 - name: Stage any changes in the dotfiles repository
   command: git add -A
   args:
-    chdir: "{{ ansible_env.HOME }}/Projects/dotfiles"
+    chdir: "{{ ansible_env.HOME }}/Projects/personal/dotfiles"
   when: git_status.stdout != ""
   tags: dotfiles
 
 - name: Commit changes in the dotfiles repository
   command: git commit -m "Auto-commit changes before syncing dotfiles"
   args:
-    chdir: "{{ ansible_env.HOME }}/Projects/dotfiles"
+    chdir: "{{ ansible_env.HOME }}/Projects/personal/dotfiles"
   register: git_commit
   failed_when: git_commit.rc not in [0, 1]  # Ignore non-zero exit if there are no changes to commit
   when: git_status.stdout != ""
@@ -34,14 +39,16 @@
 - name: Push changes to the remote repository
   command: git push origin main
   args:
-    chdir: "{{ ansible_env.HOME }}/Projects/dotfiles"
+    chdir: "{{ ansible_env.HOME }}/Projects/personal/dotfiles"
   when: git_status.stdout != "" and git_commit.rc == 0
   tags: dotfiles
 
 - name: Clone dotfiles repository
   git:
-    repo: "https://github.com/dustinholden/dotfiles.git"
-    dest: "{{ ansible_env.HOME }}/Projects/dotfiles"
+    repo: "git@github.com:dustinholden/dotfiles.git"
+    dest: "{{ ansible_env.HOME }}/Projects/personal/dotfiles"
+  environment:
+    GIT_SSH_COMMAND: "ssh -i {{ ansible_env.HOME }}/.ssh/git_personal"
     version: main
     update: yes
   when: git_status.stdout == ""
@@ -50,5 +57,5 @@
 - name: Run Dotbot to set up dotfiles
   command: ./install
   args:
-    chdir: "{{ ansible_env.HOME }}/Projects/dotfiles"
+    chdir: "{{ ansible_env.HOME }}/Projects/personal/dotfiles"
   tags: dotfiles
