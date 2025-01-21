@@ -95,14 +95,9 @@
   command: defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
   notify: restart Finder
 
-# # Mail
-# - name: Windows Friendly Attachments
-#   command: defaults write com.apple.mail SendWindowsFriendlyAttachments -bool true
-
-# Magic Bluetooth Trackpad
-- name: Enable Tap to Click for Bluetooth Trackpad
-  command: defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
-  notify: restart SystemUIServer
+# Mail
+- name: Windows Friendly Attachments
+  command: defaults write com.apple.mail SendWindowsFriendlyAttachments -bool true
 
 # Screenshots
 - name: Enable drop shadow on screenshots

@@ -13,7 +13,6 @@ homebrew_packages:
   - nmap                        # Network scanner
   - openssl                     # Security and encryption toolkit
   - python@3.13                 # Latest Python version
-  # - reattach-to-user-namespace  # Used to attach mas to signed in apple id
   - ssh-copy-id                 # Adds SSH keys to remote hosts
   - tart                        # VM manager for macOS (like Docker for macOS)
   - wget                        # Command-line file downloader
@@ -34,7 +33,7 @@ work_homebrew_casks:
   - jetbrains-toolbox           # JetBrains IDE manager
   - microsoft-auto-update       # Update manager for Microsoft products
   - microsoft-office-businesspro # Office suite for work productivity
-  - obs                         # Streaming and recording software
+  # - obs                         # Streaming and recording software
   - postman                     # API testing and development tool
   - termius                     # SSH and SFTP Client
   - visual-studio-code          # Code editor
@@ -48,7 +47,7 @@ personal_homebrew_casks:
   - steam                       # Gaming platform
   - tailscale                   # VPN and secure network connections
   - vlc                         # Versatile media player
-  - whisky                      # Open-source alternative to CrossOver for running Windows apps
+  # - whisky                      # Open-source alternative to CrossOver for running Windows apps
 
 # Primary Workstation Casks: Apps needed on your main machine only
 primary_workstation_casks:
