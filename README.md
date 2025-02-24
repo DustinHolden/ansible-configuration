@@ -13,3 +13,4 @@ Notes:
 add
 `font-0xproto-nerd-font`
 `superfile`
+https://superfile.netlify.app/getting-started/tutorial/
